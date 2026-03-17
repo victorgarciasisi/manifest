@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello-cronjob
+spec:
+  schedule: "*/1 * * * *"  # Ejecutar cada minuto
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: hello
+              image: busybox:latest
+              command: ['sh', '-c', 'date; echo "Hola desde un CronJob de Kubernetes!"']
+          restartPolicy: OnFailure

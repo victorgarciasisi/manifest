@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hpa-nginx
+spec:
+  type: ClusterIP
+  selector:
+    app: hpa-nginx
+  ports:
+    - port: 80
+      targetPort: 80

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-healthcheck
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-health
+  template:
+    metadata:
+      labels:
+        app: nginx-health
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          livenessProbe:             # Comprueba que el contenedor sigue vivo
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5   # Espera 5s antes de empezar a chequear
+            periodSeconds: 10        # Comprueba cada 10s
+          readinessProbe:            # Comprueba si el contenedor está listo para recibir tráfico
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 5
+

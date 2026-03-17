@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-nodegroup
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-nodegroup
+  template:
+    metadata:
+      labels:
+        app: web-nodegroup
+    spec:
+      nodeSelector:
+        eks.amazonaws.com/nodegroup: node-group-2-AAAAMMDD
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
