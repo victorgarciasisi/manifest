@@ -13,7 +13,7 @@ spec:
         app: web-nodegroup
     spec:
       nodeSelector:
-        eks.amazonaws.com/nodegroup: node-group-2-20260317084411901400000019
+        eks.amazonaws.com/nodegroup: node-group-2-AAAAMMDD
       containers:
         - name: nginx
           image: nginx:latest
