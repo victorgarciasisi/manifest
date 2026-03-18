@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-logger-1
+  namespace: logging-demo
+  labels:
+    app: pod-logger-1
+spec:
+  volumes:
+    - name: host-app-logs
+      hostPath:
+        path: /var/log/app
+  containers:
+    - name: app-logger-1
+      image: busybox:1.36
+      env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          mkdir -p /var/log/app/${POD_NAME};
+          echo "Escribiendo en /var/log/app/${POD_NAME}/app.log";
+          while true; do
+            echo "$(date) [pod-logger-1] línea de prueba" >> /var/log/app/${POD_NAME}/app.log;
+            sleep 2;
+          done
+      volumeMounts:
+        - name: host-app-logs
+          mountPath: /var/log/app
+

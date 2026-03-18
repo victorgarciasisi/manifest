@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-config
+  namespace: logging-demo
+data:
+  alloy.alloy: |
+    // Logging interno de Alloy
+    logging {
+      level  = "info"
+      format = "logfmt"
+    }
+
+    // 1) Writer: Loki
+    loki.write "loki" {
+      endpoint {
+        url = "http://loki.logging-demo.svc.cluster.local:80/loki/api/v1/push"
+      }
+    }
+
+    // 2) Descubrimiento de ficheros en el host
+    // Logs estándar de Kubernetes (containerd) en /var/log/containers/*.log
+    local.file_match "kubernetes_logs" {
+      path_targets = [
+        { __path__ = "/var/log/containers/*.log", job = "kubernetes" },
+      ]
+    }
+
+    // Tus ficheros propios en /var/log/app/*/app.log
+    local.file_match "app_logs" {
+      path_targets = [
+        { __path__ = "/var/log/app/*/app.log", job = "app-files" },
+      ]
+    }
+
+    // 3) Sources de Loki: leen los ficheros
+    loki.source.file "kubernetes" {
+      targets    = local.file_match.kubernetes_logs.targets
+      forward_to = [loki.process.logs.receiver]
+    }
+
+    loki.source.file "appfiles" {
+      targets    = local.file_match.app_logs.targets
+      forward_to = [loki.process.logs.receiver]
+    }
+
+    // 4) Procesamiento de logs
+    loki.process "logs" {
+      forward_to = [loki.write.loki.receiver]
+    }
