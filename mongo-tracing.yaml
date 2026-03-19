@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-tracing
+  namespace: apps-demo
+  labels:
+    app: mongo-tracing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-tracing
+  template:
+    metadata:
+      labels:
+        app: mongo-tracing
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:6.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-tracing
+  namespace: apps-demo
+  labels:
+    app: mongo-tracing
+spec:
+  selector:
+    app: mongo-tracing
+  ports:
+    - name: mongo
+      port: 27017
+      targetPort: 27017
+  type: ClusterIP
